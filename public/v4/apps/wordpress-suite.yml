@@ -17,12 +17,15 @@ services:
     $$cap_appname-wordpress:
         depends_on:
             - $$cap_appname-db
-        # Build a tiny layer to set PHP limits automatically.
-        # NOTE: When using dockerfileLines, do NOT also set "image" per CapRover rules. :contentReference[oaicite:1]{index=1}
-        caproverExtra:
-            dockerfileLines:
-                - FROM wordpress:$$cap_wp_version
-                - RUN printf "upload_max_filesize=$$cap_upload_limit\npost_max_size=$$cap_upload_limit\nmemory_limit=$$cap_php_memory\n" > /usr/local/etc/php/conf.d/uploads.ini
+        image: wordpress:$$cap_wp_version
+        # Write PHP limits at container start, then exec the default entrypoint.
+        command:
+            - bash
+            - -lc
+            - |
+                printf "upload_max_filesize=$$cap_upload_limit\npost_max_size=$$cap_upload_limit\nmemory_limit=$$cap_php_memory\n" \
+                  > /usr/local/etc/php/conf.d/uploads.ini
+                exec docker-entrypoint.sh apache2-foreground
         volumes:
             - $$cap_appname-wp-data:/var/www/html
         restart: always
@@ -31,7 +34,6 @@ services:
             WORDPRESS_DB_USER: $$cap_db_user
             WORDPRESS_DB_PASSWORD: $$cap_db_password
             WORDPRESS_DB_NAME: $$cap_wp_db_name
-            # Optional wp-config.php additions on first boot:
             WORDPRESS_CONFIG_EXTRA: |
                 define('FS_METHOD','direct');
                 define('WP_MEMORY_LIMIT','$$cap_wp_memory_limit');
@@ -64,19 +66,19 @@ caproverOneClickApp:
           label: WordPress image tag
           defaultValue: latest
           description: From docker.io/library/wordpress tags
-          validRegex: '/^([^\\s^\\/])+$/'
+          validRegex: '/^([^\s\/])+$/'
 
         - id: $$cap_mariadb_version
           label: MariaDB image tag
           defaultValue: '11'
           description: From docker.io/_/mariadb tags
-          validRegex: '/^([^\\s^\\/])+$/'
+          validRegex: '/^([^\s\/])+$/'
 
         - id: $$cap_pma_version
           label: phpMyAdmin image tag
           defaultValue: latest
           description: From docker.io/_/phpmyadmin tags
-          validRegex: '/^([^\\s^\\/])+$/'
+          validRegex: '/^([^\s\/])+$/'
 
         - id: $$cap_db_user
           label: DB user
@@ -116,10 +118,11 @@ caproverOneClickApp:
     instructions:
         start: >
             This template deploys WordPress, MariaDB, and phpMyAdmin.
-            WordPress gets higher PHP upload limits & memory via a tiny custom layer—no manual .htaccess edits.
+            WordPress uses the official image and sets PHP limits at container start—no custom build.
             After deploy: assign domains to both WordPress and phpMyAdmin services.
         end: >
             Done! Configure domains:
-            - "$$cap_appname-wordpress" → your site domain (e.g. site.apps.nieto.com)
-            - "$$cap_appname-pma" → a locked-down subdomain (e.g. pma.apps.nieto.com)
-            Recommended: enable HTTP Basic Auth on phpMyAdmin in HTTP Settings.
+            - "$$cap_appname-wordpress" → your site domain (e.g., site.apps.nieto.com)
+            - "$$cap_appname-pma" → a locked-down subdomain (e.g., pma.apps.nieto.com)
+            If you upload files larger than default, set App → HTTP Settings → Custom Nginx Config:
+            `client_max_body_size $$cap_upload_limit;`
