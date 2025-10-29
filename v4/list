@@ -1,1 +1,1 @@
-{"oneClickApps":[{"name":"wordpress-suite","displayName":"WordPress + MariaDB/MySQL + phpMyAdmin (Nieto)","description":"WordPress with MySQL or MariaDB and phpMyAdmin; upload/post/memory limits set automatically.","isOfficial":true,"logoUrl":"wordpress-suite.png"}]}
+{"oneClickApps":[{"name":"wordpress-suite","displayName":"WordPress + MariaDB + phpMyAdmin (Nieto)","description":"WordPress with MariaDB and phpMyAdmin; upload limits and memory set automatically.","isOfficial":true,"logoUrl":"wordpress-suite.png"}]}
