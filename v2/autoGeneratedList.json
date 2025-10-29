@@ -1,1 +1,1 @@
-{"appList":["wordpress-suite"],"appDetails":[{"name":"wordpress-suite","displayName":"WordPress + MariaDB + phpMyAdmin (Nieto)","description":"WordPress with MariaDB and phpMyAdmin; upload limits and memory set automatically.","isOfficial":true,"logoUrl":"wordpress-suite.png"}]}
+{"appList":["wordpress-suite"],"appDetails":[{"name":"wordpress-suite","displayName":"WordPress + MariaDB + phpMyAdmin (Nieto)","description":"WordPress with MariaDB and phpMyAdmin; upload limits & ZipArchive baked-in.","isOfficial":true,"logoUrl":"wordpress-suite.png"}]}
